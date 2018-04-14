@@ -16,6 +16,7 @@ import fr.toenga.config.ToengaConfiguration;
 import fr.toenga.config.ToengaConfiguration.GitConfiguration.Locations.ModelFolder;
 import fr.toenga.config.ToengaConfiguration.GitConfiguration.Repository;
 import fr.toenga.packets.createprocess.ToengaCreateProcessAction;
+import fr.toenga.plugins.PluginManager;
 import fr.toenga.process.ProcessModel;
 import fr.toenga.process.ProcessModelMap;
 import fr.toenga.process.ToengaProcess;
@@ -31,6 +32,7 @@ import lombok.Getter;
 public class Toenga
 {
 
+	public final static File 			pluginFolder;
 	public static final File			dataFolder;
 	public static final File			processFolder;
 	@Getter private static final Toenga	instance;
@@ -38,6 +40,8 @@ public class Toenga
 	private ToengaConfiguration			configuration;
 	private Map<String, String>			globalVars;
 	private Map<UUID, ToengaProcess>	processList;
+	
+	private PluginManager				pluginManager;
 
 	private RedisService				redisService;
 	private RabbitService				rabbitService;
@@ -45,6 +49,7 @@ public class Toenga
 
 	static
 	{
+		pluginFolder = new File("plugins");
 		dataFolder = new File("data");
 		processFolder = new File("process");
 		instance = new Toenga();
@@ -74,7 +79,8 @@ public class Toenga
 				processList.put(process.getUniqueId(), process);
 			}
 		}
-
+		
+		enablePlugins();
 	}
 
 	public void reloadConfiguration()
@@ -110,6 +116,17 @@ public class Toenga
 		this.setRabbitService(new RabbitService("mainRabbit", getConfiguration().getRabbitConfig()));
 		this.pullOrClone();
 		new RabbitActionListener(getRabbitService(), getConfiguration().getToengaName());
+	}
+	
+	private void enablePlugins()
+	{
+		pluginFolder.mkdir();
+
+		setPluginManager(new PluginManager());
+		getPluginManager().detectPlugins(pluginFolder);
+
+		getPluginManager().loadPlugins();
+		getPluginManager().enablePlugins();
 	}
 
 	private void pullOrClone()
