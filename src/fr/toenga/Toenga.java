@@ -1,8 +1,6 @@
 package fr.toenga;
 
 import java.io.File;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -100,12 +98,21 @@ public class Toenga
 
 		if (getSocketServer() != null)
 		{
-			getSocketServer().close();
+			try
+			{
+				getSocketServer().stop();
+			}
+			catch (Exception exception)
+			{
+				exception.printStackTrace();
+			}
 		}
 
 		try
 		{
-			setSocketServer(new ToengaSocketServer(new ServerSocket(), new InetSocketAddress(getConfiguration().getToengaSocketAddress(), getConfiguration().getToengaSocketPort())));
+			System.out.print(getConfiguration().getToengaSocketPort());
+			setSocketServer(new ToengaSocketServer(getConfiguration().getToengaSocketAddress(), getConfiguration().getToengaSocketPort()));
+			getSocketServer().start();
 		}
 		catch (Exception error)
 		{

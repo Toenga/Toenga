@@ -1,84 +1,27 @@
 package fr.toenga.socketserver;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 
-import fr.toenga.Toenga;
-import fr.toenga.common.utils.general.GsonUtils;
+import org.java_websocket.WebSocket;
+import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.WebSocketServer;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class ToengaSocketServer
+public class ToengaSocketServer extends WebSocketServer
 {
 
-	private ServerSocket server;
-	private List<Socket> sockets;
-
-	public ToengaSocketServer(ServerSocket server, SocketAddress address) throws IOException
+	public ToengaSocketServer(String address, int port) throws IOException
 	{
-		setSockets(new CopyOnWriteArrayList<Socket>());
-		(this.server = server).bind(address);
-		new Thread(() -> this.waitEntry()).start();
+		super(new InetSocketAddress(port));
 	}
 
-	public int socketCount()
-	{
-		return getSockets().size();
-	}
-
-	public void close()
-	{
-		for (Socket socket : getSockets())
-		{
-			try
-			{
-				socket.close();
-			}
-			catch (IOException exception)
-			{
-				exception.printStackTrace();
-			}
-		}
-		try
-		{
-			getServer().close();
-		}
-		catch (IOException exception)
-		{
-			exception.printStackTrace();
-		}
-	}
-
-	private void waitEntry()
-	{
-		try
-		{
-			Socket socket;
-			while ((socket = getServer().accept()) != null)
-			{
-				this.accept(socket);
-			}
-		}
-		catch (IOException exception)
-		{
-			exception.printStackTrace();
-		}
-	}
-
-	public void accept(Socket socket)
-	{
-		new Thread(() -> this.listen(socket)).start();
-	}
-
-	private void listen(Socket socket)
+	/*private void listen(Socket socket)
 	{
 		try
 		{
@@ -100,6 +43,46 @@ public class ToengaSocketServer
 		{
 			exception.printStackTrace();
 		}
+	}*/
+
+	@Override
+	public void onOpen(WebSocket conn, ClientHandshake handshake)
+	{
+		conn.send("Welcome to the server!");
+		broadcast("new connection: " + handshake.getResourceDescriptor());
+		System.out.println(conn.getRemoteSocketAddress().getAddress().getHostAddress() + " is connected!");
+	}
+
+	@Override
+	public void onClose(WebSocket conn, int code, String reason, boolean remote)
+	{
+		broadcast(conn + " is now disconnected!");
+		System.out.println(conn + " is now disconnected!");
+	}
+
+	@Override
+	public void onMessage(WebSocket conn, String message)
+	{
+		broadcast(message);
+		System.out.println(conn + ": " + message);
+	}
+	@Override
+	public void onMessage(WebSocket conn, ByteBuffer message)
+	{
+		broadcast(message.array());
+		System.out.println(conn + ": " + message);
+	}
+
+	@Override
+	public void onError(WebSocket conn, Exception ex)
+	{
+		ex.printStackTrace();
+	}
+
+	@Override
+	public void onStart()
+	{
+		System.out.println("Server started on port " + getPort());
 	}
 
 }
