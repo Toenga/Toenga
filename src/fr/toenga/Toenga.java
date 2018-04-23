@@ -13,6 +13,7 @@ import fr.toenga.config.ProcessConfiguration;
 import fr.toenga.config.ToengaConfiguration;
 import fr.toenga.config.ToengaConfiguration.GitConfiguration.Locations.ModelFolder;
 import fr.toenga.config.ToengaConfiguration.GitConfiguration.Repository;
+import fr.toenga.config.ToengaWebSocketServerConfiguration;
 import fr.toenga.packets.createprocess.ToengaCreateProcessAction;
 import fr.toenga.plugins.PluginManager;
 import fr.toenga.process.ProcessModel;
@@ -110,8 +111,8 @@ public class Toenga
 
 		try
 		{
-			System.out.print(getConfiguration().getToengaSocketPort());
-			setSocketServer(new ToengaSocketServer(getConfiguration().getToengaSocketAddress(), getConfiguration().getToengaSocketPort()));
+			ToengaWebSocketServerConfiguration wsConfig = getConfiguration().getWebSocketServer();
+			setSocketServer(new ToengaSocketServer(wsConfig.getPort(), wsConfig.getEncryptionKey(), wsConfig.getWhitelist()));
 			getSocketServer().start();
 		}
 		catch (Exception error)

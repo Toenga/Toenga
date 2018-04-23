@@ -79,7 +79,7 @@ public class ToengaUtils
                 System.out.println("Pull " + repository.getUrl() + " (" + repository.getBranch() + ")" + " in " + repository.getFolder() + "..");
                 final PullCommand pull = repos.pull();
                 pull.setProgressMonitor(new TextProgressMonitor());
-                pull.setCredentialsProvider(new UsernamePasswordCredentialsProvider(configuration.toengaData.getUser(), configuration.toengaData.getPassword()));
+                pull.setCredentialsProvider(new UsernamePasswordCredentialsProvider(configuration.getToengaData().getUser(), configuration.getToengaData().getPassword()));
                 pull.call();
             }
             catch (GitAPIException e)
@@ -101,7 +101,7 @@ public class ToengaUtils
         clone.setCloneSubmodules(true);
         clone.setBranchesToClone(Arrays.asList(repository.getBranch()));
         clone.setProgressMonitor(new TextProgressMonitor());
-        clone.setCredentialsProvider(new UsernamePasswordCredentialsProvider(configuration.toengaData.getUser(), configuration.toengaData.getPassword()));
+        clone.setCredentialsProvider(new UsernamePasswordCredentialsProvider(configuration.getToengaData().getUser(), configuration.getToengaData().getPassword()));
         try
         {
             clone.call();

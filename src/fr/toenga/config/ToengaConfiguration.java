@@ -10,20 +10,18 @@ import lombok.Data;
 public class ToengaConfiguration
 {
 	
-	public String			toengaName;
-    public String			toengaSocket;
-    public String			toengaSocketAddress;
-    public int				toengaSocketPort;
-    public boolean			allowParallelConsole;
-    public GitConfiguration	toengaData;
-    public RedisSettings	redisConfig;
-    public RabbitSettings	rabbitConfig;
+	private String								toengaName;
+	private String								toengaSocket;
+	private ToengaWebSocketServerConfiguration	webSocketServer;
+    private boolean								allowParallelConsole;
+    private GitConfiguration					toengaData;
+    private RedisSettings						redisConfig;
+    private RabbitSettings						rabbitConfig;
     
     public ToengaConfiguration()
     {
         setToengaSocket("toenga.sock");
-        setToengaSocketAddress("127.0.0.1");
-        setToengaSocketPort(30000);
+        setWebSocketServer(new ToengaWebSocketServerConfiguration());
         setAllowParallelConsole(false);
         setToengaData(new GitConfiguration());
         setRedisConfig(new RedisSettings(new String[] { "localhost" }, 5672, "admin123", 0, 32));
