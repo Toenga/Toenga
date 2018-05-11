@@ -4,12 +4,12 @@ package fr.toenga.process;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import org.java_websocket.WebSocket;
 import org.newsclub.net.unix.AFUNIXServerSocket;
 import org.newsclub.net.unix.AFUNIXSocketAddress;
 
@@ -224,15 +224,16 @@ public class ToengaProcess
 		return Toenga.getInstance().getConfiguration().isAllowParallelConsole() || getSockets().stream().mapToInt(socket -> socket.socketCount()).sum() == 0;
 	}
 
-	public void acceptSocket(Socket socket) throws IOException
+	public void acceptSocket(WebSocket socket) throws IOException
 	{
 		if (getSockets().isEmpty() || !isRunning()) {
-			socket.getOutputStream().write("This process isn't running!\n".getBytes());
+			socket.send("This process isn't running!\n".getBytes());
 			socket.close();
 		}
 		else
 		{
-			getSockets().get(0).accept(socket);
+			//getSockets().get(0).accept(socket);
+			socket.send("okok try to accept socket " + this.getUniqueId() + ", contact xMalware\n".getBytes());
 		}
 	}
 

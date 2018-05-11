@@ -2,7 +2,8 @@ package fr.toenga.socketserver;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.Socket;
+
+import org.java_websocket.WebSocket;
 
 import fr.toenga.Toenga;
 import fr.toenga.common.tech.redis.RedisService;
@@ -19,7 +20,7 @@ import lombok.EqualsAndHashCode;
 public class TokenInfo extends Callback<TokenRedisInfo>
 {
 
-	public transient Socket socket;
+	public transient WebSocket socket;
 	public String token;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -37,20 +38,13 @@ public class TokenInfo extends Callback<TokenRedisInfo>
 			{
 				error.printStackTrace();
 			}
-			try
-			{
-				getSocket().close();
-			}
-			catch (IOException exception)
-			{
-				exception.printStackTrace();
-			}
+			getSocket().close();
 		}
 		else
 		{
 			try
 			{
-				if (!getSocket().getInetAddress().equals(InetAddress.getByName(result.ip)))
+				if (!getSocket().getRemoteSocketAddress().getAddress().equals(InetAddress.getByName(result.ip)))
 				{
 					getSocket().close();
 					return;
@@ -69,14 +63,7 @@ public class TokenInfo extends Callback<TokenRedisInfo>
 			catch (IOException exception)
 			{
 				exception.printStackTrace();
-				try
-				{
-					getSocket().close();
-				}
-				catch (IOException ex2)
-				{
-					ex2.printStackTrace();
-				}
+				getSocket().close();
 			}
 		}
 	}

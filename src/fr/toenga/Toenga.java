@@ -112,7 +112,7 @@ public class Toenga
 		try
 		{
 			ToengaWebSocketServerConfiguration wsConfig = getConfiguration().getWebSocketServer();
-			setSocketServer(new ToengaSocketServer(wsConfig.getPort(), wsConfig.getEncryptionKey(), wsConfig.getWhitelist()));
+			setSocketServer(new ToengaSocketServer(wsConfig.getPort(), wsConfig.getEncryptionKey()));
 			getSocketServer().start();
 		}
 		catch (Exception error)
